@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>12.0</LangVersion>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <AssemblyName>Medallion</AssemblyName>
+    <RootNamespace>Medallion.App</RootNamespace>
+    <PlatformTarget>x64</PlatformTarget>
+    <ApplicationIcon>Assets\medallion.ico</ApplicationIcon>
+    <Product>Medallion</Product>
+    <AssemblyTitle>Medallion</AssemblyTitle>
+    <Company>Medallion</Company>
+    <Description>Instant replay clipping for Windows</Description>
+    <Version>1.0.0</Version>
+    <Copyright>Copyright (c) 2026</Copyright>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    <!-- Workstation concurrent GC off: lower background CPU while idle in tray. -->
+    <ServerGarbageCollection>false</ServerGarbageCollection>
+    <ConcurrentGarbageCollection>false</ConcurrentGarbageCollection>
+    <TieredPGO>true</TieredPGO>
+    <!-- InvariantGlobalization must stay off: WPF resolves a non-neutral culture for
+         FrameworkElement.Language at load time and throws without ICU data. -->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Medallion.Core\Medallion.Core.csproj" />
+  </ItemGroup>
+
+</Project>

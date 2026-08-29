@@ -1,0 +1,12 @@
+# Build output
+bin/
+obj/
+*.user
+*.suo
+.vs/
+
+# Portable package and release artifacts.
+# ffmpeg.exe (202 MB) and the release zip (135 MB) exceed GitHub's 100 MB file
+# limit, and the GPL-licensed ffmpeg binary does not belong in this tree anyway.
+# The packaged build is published as a GitHub Release asset instead.
+publish/

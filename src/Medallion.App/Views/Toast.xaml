@@ -1,0 +1,38 @@
+<Window x:Class="Medallion.App.Views.Toast"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Width="360" SizeToContent="Height"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        ShowInTaskbar="False" ShowActivated="False" Topmost="True"
+        ResizeMode="NoResize" Focusable="False">
+
+    <Border x:Name="Root" Background="#F2141720" CornerRadius="12" BorderBrush="#FF2A2F3D" BorderThickness="1"
+            Padding="14,12" Margin="12" Cursor="Hand" MouseLeftButtonUp="OnClick">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="28" ShadowDepth="8" Opacity="0.6" Color="Black" />
+        </Border.Effect>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Border x:Name="Badge" Grid.Column="0" Width="34" Height="34" CornerRadius="10"
+                    Background="#1F2DE0A5" VerticalAlignment="Top">
+                <TextBlock x:Name="BadgeGlyph" Text="&#xE73E;" FontFamily="Segoe MDL2 Assets"
+                           FontSize="14" Foreground="#FF2DE0A5"
+                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Border>
+
+            <StackPanel Grid.Column="1" Margin="12,0,0,0">
+                <TextBlock x:Name="TitleText" Text="Clip saved"
+                           FontFamily="Segoe UI Variable Display, Segoe UI" FontSize="14"
+                           FontWeight="SemiBold" Foreground="#FFE9EBF2" />
+                <TextBlock x:Name="BodyText" Margin="0,3,0,0" TextWrapping="Wrap" MaxHeight="54"
+                           FontFamily="Segoe UI Variable Display, Segoe UI" FontSize="11.5"
+                           Foreground="#FF9AA0B4" TextTrimming="CharacterEllipsis" />
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>

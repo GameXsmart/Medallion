@@ -1,0 +1,441 @@
+<UserControl x:Class="Medallion.App.Views.SettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             FontFamily="{StaticResource UiFont}">
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+
+        <Style x:Key="Section" TargetType="Border" BasedOn="{StaticResource Card}">
+            <Setter Property="Margin" Value="0,0,0,12" />
+            <Setter Property="Padding" Value="20,18" />
+        </Style>
+
+        <Style x:Key="SectionHeading" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="14.5" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{DynamicResource Text}" />
+            <Setter Property="Margin" Value="0,0,0,14" />
+        </Style>
+
+        <Style x:Key="RowLabel" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Foreground" Value="{DynamicResource Text}" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+
+        <Style x:Key="RowHint" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="11.5" />
+            <Setter Property="Foreground" Value="{DynamicResource TextFaint}" />
+            <Setter Property="Margin" Value="0,3,0,0" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+        </Style>
+
+        <Style x:Key="Row" TargetType="Grid">
+            <Setter Property="Margin" Value="0,0,0,14" />
+        </Style>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto" Padding="26,10,20,10">
+            <StackPanel MaxWidth="820" HorizontalAlignment="Stretch">
+
+                <!-- ============ Appearance ============ -->
+                <Border Style="{StaticResource Section}">
+                    <StackPanel>
+                        <TextBlock Text="Appearance" Style="{StaticResource SectionHeading}" />
+                        <Grid Style="{StaticResource Row}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="300" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                <TextBlock Text="Theme" Style="{StaticResource RowLabel}" />
+                                <TextBlock Style="{StaticResource RowHint}"
+                                           Text="AMOLED is pure black — deeper contrast, and unlit pixels on an OLED panel." />
+                            </StackPanel>
+                            <ComboBox Grid.Column="1" Style="{StaticResource Dropdown}"
+                                      ItemsSource="{Binding ThemeOptions}"
+                                      SelectedItem="{Binding SelectedTheme, Mode=TwoWay}" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- ============ Capture ============ -->
+                <Border Style="{StaticResource Section}">
+                    <StackPanel>
+                        <TextBlock Text="Capture source" Style="{StaticResource SectionHeading}" />
+
+                        <Grid Style="{StaticResource Row}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="300" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                <TextBlock Text="Mode" Style="{StaticResource RowLabel}" />
+                                <TextBlock Style="{StaticResource RowHint}"
+                                           Text="Application mode follows the window and crops to it on the GPU." />
+                            </StackPanel>
+                            <ComboBox Grid.Column="1" Style="{StaticResource Dropdown}"
+                                      ItemsSource="{Binding CaptureModes}"
+                                      SelectedItem="{Binding SelectedCaptureMode, Mode=TwoWay}" />
+                        </Grid>
+
+                        <Grid Style="{StaticResource Row}"
+                              Visibility="{Binding IsMonitorMode, Converter={StaticResource BoolToVis}}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="300" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Monitor" Style="{StaticResource RowLabel}" />
+                            <ComboBox Grid.Column="1" Style="{StaticResource Dropdown}"
+                                      ItemsSource="{Binding Monitors}" DisplayMemberPath="DisplayLabel"
+                                      SelectedItem="{Binding SelectedMonitor, Mode=TwoWay}" />
+                        </Grid>
+
+                        <Grid Style="{StaticResource Row}"
+                              Visibility="{Binding IsApplicationMode, Converter={StaticResource BoolToVis}}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="300" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                <TextBlock Text="Application" Style="{StaticResource RowLabel}" />
+                                <TextBlock Style="{StaticResource RowHint}"
+                                           Text="Fullscreen games capture at full speed with no cropping cost." />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1">
+                                <ComboBox Style="{StaticResource Dropdown}" ItemsSource="{Binding Windows}"
+                                          DisplayMemberPath="DisplayLabel"
+                                          SelectedItem="{Binding SelectedWindow, Mode=TwoWay}" />
+                                <Button Style="{StaticResource GhostButton}" Content="Refresh list"
+                                        Command="{Binding RefreshWindowsCommand}" Margin="0,8,0,0"
+                                        HorizontalAlignment="Right" Padding="11,6" FontSize="11.5" />
+                            </StackPanel>
+                        </Grid>
+
+                        <CheckBox Style="{StaticResource ToggleSwitch}" Content="Show mouse cursor"
+                                  IsChecked="{Binding DrawMouse, Mode=TwoWay}" />
+                    </StackPanel>
+                </Border>
+
+                <!-- ============ Video ============ -->
+                <Border Style="{StaticResource Section}">
+                    <StackPanel>
+                        <TextBlock Text="Video" Style="{StaticResource SectionHeading}" />
+
+                        <Grid Style="{StaticResource Row}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="300" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Frame rate" Style="{StaticResource RowLabel}" />
+                            <ComboBox Grid.Column="1" Style="{StaticResource Dropdown}"
+                                      ItemsSource="{Binding FpsOptions}"
+                                      SelectedItem="{Binding SelectedFps, Mode=TwoWay}" />
+                        </Grid>
+
+                        <Grid Style="{StaticResource Row}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="300" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Resolution" Style="{StaticResource RowLabel}" />
+                            <ComboBox Grid.Column="1" Style="{StaticResource Dropdown}"
+                                      ItemsSource="{Binding ResolutionOptions}"
+                                      SelectedItem="{Binding SelectedResolution, Mode=TwoWay}" />
+                        </Grid>
+
+                        <Grid Style="{StaticResource Row}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="300" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                <TextBlock Text="Bitrate" Style="{StaticResource RowLabel}" />
+                                <TextBlock Text="{Binding EstimatedBufferMb}" Style="{StaticResource RowHint}" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Text="{Binding BitrateLabel}" Style="{StaticResource RowLabel}"
+                                           HorizontalAlignment="Right" />
+                                <Slider Style="{StaticResource Slim}" Minimum="2" Maximum="60"
+                                        TickFrequency="1" IsSnapToTickEnabled="True"
+                                        Value="{Binding BitrateMbps, Mode=TwoWay}" Margin="0,4,0,0" />
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid Style="{StaticResource Row}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="300" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                <TextBlock Text="Clip length" Style="{StaticResource RowLabel}" />
+                                <TextBlock Style="{StaticResource RowHint}"
+                                           Text="How much footage the rolling buffer keeps." />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Text="{Binding ClipSecondsLabel}" Style="{StaticResource RowLabel}"
+                                           HorizontalAlignment="Right" />
+                                <Slider Style="{StaticResource Slim}" Minimum="5" Maximum="120"
+                                        TickFrequency="5" IsSnapToTickEnabled="True"
+                                        Value="{Binding ClipSeconds, Mode=TwoWay}" Margin="0,4,0,0" />
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid Style="{StaticResource Row}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="300" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                <TextBlock Text="Encoder" Style="{StaticResource RowLabel}" />
+                                <TextBlock Style="{StaticResource RowHint}"
+                                           Text="Automatic tests each hardware encoder on this PC and picks the cheapest that works." />
+                            </StackPanel>
+                            <ComboBox Grid.Column="1" Style="{StaticResource Dropdown}"
+                                      ItemsSource="{Binding EncoderOptions}"
+                                      SelectedItem="{Binding SelectedEncoder, Mode=TwoWay}" />
+                        </Grid>
+
+                        <Grid Style="{StaticResource Row}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="300" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Codec" Style="{StaticResource RowLabel}" />
+                            <ComboBox Grid.Column="1" Style="{StaticResource Dropdown}"
+                                      ItemsSource="{Binding CodecOptions}"
+                                      SelectedItem="{Binding SelectedCodec, Mode=TwoWay}" />
+                        </Grid>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="300" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="File format" Style="{StaticResource RowLabel}" />
+                            <ComboBox Grid.Column="1" Style="{StaticResource Dropdown}"
+                                      ItemsSource="{Binding ContainerOptions}"
+                                      SelectedItem="{Binding SelectedContainer, Mode=TwoWay}" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- ============ Audio ============ -->
+                <Border Style="{StaticResource Section}">
+                    <StackPanel>
+                        <TextBlock Text="Audio" Style="{StaticResource SectionHeading}" />
+
+                        <CheckBox Style="{StaticResource ToggleSwitch}" Content="Capture system / game audio"
+                                  IsChecked="{Binding CaptureSystemAudio, Mode=TwoWay}" Margin="0,0,0,12" />
+
+                        <Grid Style="{StaticResource Row}" IsEnabled="{Binding CaptureSystemAudio}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="300" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Output device" Style="{StaticResource RowLabel}" />
+                            <ComboBox Grid.Column="1" Style="{StaticResource Dropdown}"
+                                      ItemsSource="{Binding RenderDevices}"
+                                      SelectedItem="{Binding SelectedRenderDevice, Mode=TwoWay}" />
+                        </Grid>
+
+                        <Grid Style="{StaticResource Row}" IsEnabled="{Binding CaptureSystemAudio}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="300" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="System volume" Style="{StaticResource RowLabel}" />
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Text="{Binding SystemVolumeLabel}" Style="{StaticResource RowLabel}"
+                                           HorizontalAlignment="Right" />
+                                <Slider Style="{StaticResource Slim}" Minimum="0" Maximum="200"
+                                        Value="{Binding SystemVolume, Mode=TwoWay}" Margin="0,4,0,0" />
+                            </StackPanel>
+                        </Grid>
+
+                        <Border Height="1" Background="{DynamicResource StrokeSoft}" Margin="0,4,0,16" />
+
+                        <CheckBox Style="{StaticResource ToggleSwitch}" Content="Capture microphone"
+                                  IsChecked="{Binding CaptureMicrophone, Mode=TwoWay}" Margin="0,0,0,12" />
+
+                        <Grid Style="{StaticResource Row}" IsEnabled="{Binding CaptureMicrophone}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="300" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Microphone" Style="{StaticResource RowLabel}" />
+                            <ComboBox Grid.Column="1" Style="{StaticResource Dropdown}"
+                                      ItemsSource="{Binding CaptureDevices}"
+                                      SelectedItem="{Binding SelectedCaptureDevice, Mode=TwoWay}" />
+                        </Grid>
+
+                        <Grid Style="{StaticResource Row}" IsEnabled="{Binding CaptureMicrophone}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="300" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Microphone volume" Style="{StaticResource RowLabel}" />
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Text="{Binding MicVolumeLabel}" Style="{StaticResource RowLabel}"
+                                           HorizontalAlignment="Right" />
+                                <Slider Style="{StaticResource Slim}" Minimum="0" Maximum="200"
+                                        Value="{Binding MicVolume, Mode=TwoWay}" Margin="0,4,0,0" />
+                            </StackPanel>
+                        </Grid>
+
+                        <CheckBox Style="{StaticResource ToggleSwitch}"
+                                  Content="Keep microphone on a separate audio track"
+                                  IsChecked="{Binding SeparateAudioTracks, Mode=TwoWay}" />
+
+                        <Button Style="{StaticResource GhostButton}" Content="Refresh devices"
+                                Command="{Binding RefreshDevicesCommand}" HorizontalAlignment="Left"
+                                Margin="0,14,0,0" Padding="11,6" FontSize="11.5" />
+                    </StackPanel>
+                </Border>
+
+                <!-- ============ Hotkey ============ -->
+                <Border Style="{StaticResource Section}">
+                    <StackPanel>
+                        <TextBlock Text="Hotkey" Style="{StaticResource SectionHeading}" />
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="300" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                <TextBlock Text="Save clip" Style="{StaticResource RowLabel}" />
+                                <TextBlock Text="{Binding HotkeyStatusLabel}" Style="{StaticResource RowHint}" />
+                            </StackPanel>
+                            <Button x:Name="HotkeyButton" Grid.Column="1" Style="{StaticResource GhostButton}"
+                                    Content="{Binding HotkeyLabel}" Click="OnCaptureHotkey" Height="36" />
+                        </Grid>
+
+                        <Grid Margin="0,16,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="300" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                <TextBlock Text="Pause / resume buffer" Style="{StaticResource RowLabel}" />
+                                <TextBlock Style="{StaticResource RowHint}"
+                                           Text="Optional. Handy before anything you would rather not record." />
+                            </StackPanel>
+                            <Grid Grid.Column="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Button x:Name="PauseHotkeyButton" Grid.Column="0"
+                                        Style="{StaticResource GhostButton}"
+                                        Content="{Binding PauseHotkeyLabel}" Click="OnCapturePauseHotkey"
+                                        Height="36" />
+                                <Button Grid.Column="1" Style="{StaticResource GhostButton}" Content="Clear"
+                                        Click="OnClearPauseHotkey" Margin="8,0,0,0" Height="36"
+                                        Padding="11,0" FontSize="11.5" />
+                            </Grid>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- ============ Storage ============ -->
+                <Border Style="{StaticResource Section}">
+                    <StackPanel>
+                        <TextBlock Text="Storage" Style="{StaticResource SectionHeading}" />
+
+                        <TextBlock Text="Save clips to" Style="{StaticResource RowLabel}" Margin="0,0,0,6" />
+                        <Grid Style="{StaticResource Row}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0" Style="{StaticResource Field}"
+                                     Text="{Binding SaveDirectory, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
+                            <Button Grid.Column="1" Style="{StaticResource GhostButton}" Content="Browse…"
+                                    Click="OnBrowseFolder" Margin="8,0,0,0" />
+                        </Grid>
+
+                        <Grid Style="{StaticResource Row}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="300" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                <TextBlock Text="Keep at most" Style="{StaticResource RowLabel}" />
+                                <TextBlock Text="{Binding MaxLibraryLabel}" Style="{StaticResource RowHint}" />
+                            </StackPanel>
+                            <Slider Grid.Column="1" Style="{StaticResource Slim}" Minimum="0" Maximum="200"
+                                    TickFrequency="5" IsSnapToTickEnabled="True"
+                                    Value="{Binding MaxLibraryGb, Mode=TwoWay}" VerticalAlignment="Center" />
+                        </Grid>
+
+                        <TextBlock Text="File name" Style="{StaticResource RowLabel}" Margin="0,0,0,6" />
+                        <TextBox Style="{StaticResource Field}"
+                                 Text="{Binding FileNameTemplate, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
+                        <TextBlock Style="{StaticResource RowHint}"
+                                   Text="{}{app} becomes the captured game or monitor; anything else in braces is a date format, for example {}{yyyy-MM-dd_HH-mm-ss}." />
+                    </StackPanel>
+                </Border>
+
+                <!-- ============ Application ============ -->
+                <Border Style="{StaticResource Section}">
+                    <StackPanel>
+                        <TextBlock Text="Application" Style="{StaticResource SectionHeading}" />
+
+                        <CheckBox Style="{StaticResource ToggleSwitch}" Content="Start with Windows"
+                                  IsChecked="{Binding StartWithWindows, Mode=TwoWay}" Margin="0,0,0,13" />
+                        <CheckBox Style="{StaticResource ToggleSwitch}" Content="Start minimised to the tray"
+                                  IsChecked="{Binding StartMinimized, Mode=TwoWay}" Margin="0,0,0,13" />
+                        <CheckBox Style="{StaticResource ToggleSwitch}" Content="Closing the window keeps Replay in the tray"
+                                  IsChecked="{Binding MinimizeToTray, Mode=TwoWay}" Margin="0,0,0,13" />
+                        <CheckBox Style="{StaticResource ToggleSwitch}" Content="Show a notification when a clip is saved"
+                                  IsChecked="{Binding ShowNotifications, Mode=TwoWay}" Margin="0,0,0,13" />
+                        <CheckBox Style="{StaticResource ToggleSwitch}" Content="Play a chime when a clip is saved"
+                                  IsChecked="{Binding PlaySoundOnSave, Mode=TwoWay}" Margin="0,0,0,13" />
+                        <CheckBox Style="{StaticResource ToggleSwitch}" Content="Start the replay buffer automatically"
+                                  IsChecked="{Binding AutoStartBuffer, Mode=TwoWay}" Margin="0,0,0,16" />
+
+                        <TextBlock Text="FFmpeg location" Style="{StaticResource RowLabel}" Margin="0,0,0,6" />
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0" Style="{StaticResource Field}"
+                                     Text="{Binding FfmpegPath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
+                            <Button Grid.Column="1" Style="{StaticResource GhostButton}" Content="Browse…"
+                                    Click="OnBrowseFfmpeg" Margin="8,0,0,0" />
+                        </Grid>
+                        <TextBlock Text="{Binding FfmpegStatus}" Style="{StaticResource RowHint}" />
+
+                        <Button Style="{StaticResource GhostButton}" Content="Open log file"
+                                Command="{Binding OpenLogCommand}" HorizontalAlignment="Left"
+                                Margin="0,14,0,0" Padding="11,6" FontSize="11.5" />
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- ============ Save bar ============ -->
+        <Border Grid.Row="1" Background="{DynamicResource Bg1}" BorderBrush="{DynamicResource StrokeSoft}"
+                BorderThickness="0,1,0,0" Padding="26,12"
+                Visibility="{Binding IsDirty, Converter={StaticResource BoolToVis}}">
+            <Grid>
+                <TextBlock Text="You have unsaved changes" Style="{StaticResource BodyText}"
+                           VerticalAlignment="Center" />
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Style="{StaticResource GhostButton}" Content="Discard"
+                            Command="{Binding DiscardCommand}" Margin="0,0,8,0" />
+                    <Button Style="{StaticResource PrimaryButton}" Content="Save changes"
+                            Command="{Binding SaveCommand}" Padding="20,9" />
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>
