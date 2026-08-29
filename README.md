@@ -16,7 +16,8 @@ Capture: Entire Screen
 
 ## Just want to run it
 
-Grab `publish/Medallion-1.0.0-win-x64.zip`, unzip it anywhere, run `Medallion.exe`.
+Download the zip from the [latest release](https://github.com/GameXsmart/Medallion/releases/latest),
+unzip it anywhere, run `Medallion.exe`.
 
 No .NET, no FFmpeg, no installer, no admin rights — the runtime and FFmpeg are in the
 folder. Keep `Medallion.exe` and `ffmpeg.exe` together and it works on any Windows 10/11
@@ -123,8 +124,11 @@ src/
   Medallion.Doctor/         command-line diagnostics
 docs/
 tools/make_icon.py          generates the application icon
-publish/                    portable package and zip
 ```
+
+`publish/` is produced locally by the packaging step and is not tracked: the bundled
+FFmpeg binary is 202 MB, well past GitHub's 100 MB file limit, so the built package is
+attached to releases instead.
 
 Settings live in `%APPDATA%\Medallion\settings.json`, logs in `%APPDATA%\Medallion\logs`,
 and clips default to `%USERPROFILE%\Videos\Medallion`.
