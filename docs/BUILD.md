@@ -81,7 +81,19 @@ metadata falls back to parsing ffmpeg's own output, which saves another 200 MB.
 dotnet run --project src\Medallion.Doctor -c Release              # environment report
 dotnet run --project src\Medallion.Doctor -c Release -- probe     # test every encoder pipeline
 dotnet run --project src\Medallion.Doctor -c Release -- record 40 # buffer 40s, save, verify
+dotnet run --project src\Medallion.Doctor -c Release -- edit       # exercise every editor export path
 ```
+
+`edit` runs a precise trim, a lossless trim and a speed/scale/mute export against your most
+recent clip, then measures the result against what was asked for:
+
+```
+  PASS  precise trim              4566 ms  5.00s (wanted 5.00s, drift 0.00s)  1920x1080
+  PASS  lossless trim              189 ms  7.02s (wanted 5.00s, drift 2.02s)  1920x1080
+  PASS  2x speed, muted, 720p     2185 ms  2.53s (wanted 2.50s, drift 0.03s)  1280x720
+```
+
+The lossless drift is expected: a stream copy can only start on a keyframe.
 
 `record` is the quickest way to prove the whole chain works: it prints live buffer depth and
 frame rate, saves a clip, reports how long the save took, and then confirms that buffering

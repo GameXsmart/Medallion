@@ -39,6 +39,9 @@ x64 machine.
 - **Three capture modes.** Entire screen, a specific monitor, or a specific application
   window (tracked and cropped on the GPU as it moves).
 - **Audio.** System/game audio and microphone, per-source volume, optional separate tracks.
+- **Built-in editor.** Trim with a scrubbing timeline, change speed, drop the audio,
+  export smaller — either as a copy or over the original. Trim-only edits can be done as a
+  lossless stream copy in a fraction of a second.
 - **Two themes.** Dark, and AMOLED — true `#000000` black, switching live.
 - **Tray-resident.** Close the window and the buffer keeps running.
 
@@ -52,6 +55,7 @@ x64 machine.
 | `{app}` in file names | Clips are named after the game or monitor they came from |
 | Storage cap | Keep at most *N* GB; the oldest clips are pruned automatically |
 | Library search and sort | Filter by name; order by newest, oldest, largest or longest |
+| Editor shortcuts | Space to play, I and O to set the trim, arrows to step (Shift for 1s) |
 | Tray shortcuts | Save, pause/resume, clips folder, dashboard, settings, exit |
 
 ## Measured on the development machine
@@ -119,6 +123,7 @@ src/
     Audio/                  WASAPI loopback and microphone into named pipes
     Hotkeys/                global hotkeys with a keyboard-hook fallback
     Clips/                  clip writer, library, thumbnails, pruning
+    Editing/                trim, speed, scale and mute export
     Config/                 settings model and atomic JSON store
   Medallion.App/            WPF interface, themes, tray, notifications
   Medallion.Doctor/         command-line diagnostics

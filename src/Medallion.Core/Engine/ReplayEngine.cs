@@ -116,6 +116,12 @@ public sealed class ReplayEngine : IDisposable
     }
 
     public EngineState State { get { lock (_gate) return _state; } }
+
+    /// <summary>
+    /// The encoder the probe settled on, e.g. h264_amf. The clip editor reuses it so a
+    /// re-encode runs on hardware already proven to work on this machine.
+    /// </summary>
+    public string? ActiveEncoderName { get { lock (_gate) return _activeProfile?.EncoderName; } }
     public bool IsSaving { get; private set; }
 
     public ReplayEngine(Settings settings, ClipLibrary library)

@@ -157,6 +157,31 @@ The supervisor loop treats every failure below it as recoverable:
 | Settings file corrupt | quarantine it and start from defaults |
 | Unhandled UI exception | logged and swallowed — the buffer keeps running |
 
+## Editing
+
+`ClipEditor` turns an `EditSpec` into an ffmpeg invocation. There are two paths, and which
+one runs is decided by what the edit actually needs:
+
+- **Stream copy** when the edit is only a trim. Instant — 189 ms for a 5 second cut — and
+  bit-for-bit lossless, but the start can only land on a keyframe, so the clip may begin up
+  to one GOP (about 2 seconds) earlier than requested. Measured drift: 2.02 s.
+- **Re-encode** for anything that changes pixels or timing: speed (`setpts` plus `atempo`),
+  rescaling, or a frame-accurate trim. Measured drift: 0.00 s.
+
+The re-encode reuses whichever hardware encoder the capture probe already proved works on
+this machine, and retries the whole export with libx264 if the encoder refuses the job —
+some encoders accept live D3D11 surfaces but not decoded file frames.
+
+Progress comes from `-progress` on stdout, measured against the *output* duration so a
+speed change does not skew the bar.
+
+Two things about the preview are worth knowing, because both were bugs first. WPF's
+`MediaElement` truncates `NaturalDuration` to whole seconds — it reports 30 s for a 30.671 s
+file — and it can report a partial duration while the file is still opening, which silently
+collapsed the trim selection to its 0.3 s minimum. The container duration from the clip
+library is exact and stable, so it wins; the player's value is only used when metadata was
+unavailable, and only once.
+
 ## Theming
 
 Palette colours are referenced throughout the XAML as `DynamicResource`, and switching

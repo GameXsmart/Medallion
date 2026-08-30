@@ -123,6 +123,8 @@
                     <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                         <Button Style="{StaticResource GhostButton}" Content="Play"
                                 Command="{Binding PlayLastCommand}" Margin="0,0,8,0" />
+                        <Button Style="{StaticResource GhostButton}" Content="Edit"
+                                Click="OnEditLastClip" Margin="0,0,8,0" />
                         <Button Style="{StaticResource GhostButton}" Content="Show in folder"
                                 Command="{Binding RevealLastCommand}" />
                     </StackPanel>

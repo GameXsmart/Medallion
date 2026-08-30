@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Input;
 using Medallion.App.ViewModels;
+using Medallion.Core.Clips;
 using Medallion.Core.Diagnostics;
 
 namespace Medallion.App.Views;
@@ -11,6 +12,7 @@ public partial class MainWindow : Window
     private DashboardView? _dashboard;
     private LibraryView? _library;
     private SettingsView? _settings;
+    private EditorView? _editor;
 
     public MainWindow()
     {
@@ -31,6 +33,13 @@ public partial class MainWindow : Window
                 _library.Refresh();
                 break;
 
+            case "editor":
+                if (_editor is null) return; // only reachable through OpenEditor
+                PageHost.Content = _editor;
+                PageTitle.Text = "Edit clip";
+                NavLibrary.IsChecked = true;
+                break;
+
             case "settings":
                 _settings ??= new SettingsView();
                 PageHost.Content = _settings;
@@ -48,9 +57,28 @@ public partial class MainWindow : Window
         }
     }
 
+    /// <summary>Opens the editor on a clip. The editor lives under Clips in the sidebar.</summary>
+    public void OpenEditor(ClipInfo clip)
+    {
+        if (_editor is null)
+        {
+            _editor = new EditorView();
+            _editor.Exported += () =>
+            {
+                _library?.Refresh();
+                Navigate("library");
+            };
+        }
+
+        _editor.Load(clip);
+        Navigate("editor");
+    }
+
     private void OnNavChecked(object sender, RoutedEventArgs e)
     {
         if (!IsLoaded) return;
+
+        _editor?.Stop();
 
         if (ReferenceEquals(sender, NavLibrary)) Navigate("library");
         else if (ReferenceEquals(sender, NavSettings)) Navigate("settings");

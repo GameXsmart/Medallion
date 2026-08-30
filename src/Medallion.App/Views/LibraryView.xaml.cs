@@ -49,6 +49,12 @@ public partial class LibraryView : UserControl
         }
     }
 
+    private void OnEditClick(object sender, RoutedEventArgs e)
+    {
+        if ((sender as FrameworkElement)?.DataContext is ClipItemViewModel item)
+            (Window.GetWindow(this) as MainWindow)?.OpenEditor(item.Clip);
+    }
+
     private void OnDeleteClick(object sender, RoutedEventArgs e)
     {
         if ((sender as FrameworkElement)?.DataContext is not ClipItemViewModel item) return;

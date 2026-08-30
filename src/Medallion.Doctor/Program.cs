@@ -3,6 +3,7 @@ using Medallion.Core.Audio;
 using Medallion.Core.Capture;
 using Medallion.Core.Clips;
 using Medallion.Core.Config;
+using Medallion.Core.Editing;
 using Medallion.Core.Encoding;
 using Medallion.Core.Engine;
 
@@ -27,6 +28,7 @@ internal static class Program
         {
             "probe" => Probe(),
             "record" => Record(args.Length > 1 && int.TryParse(args[1], out var s) ? s : 40),
+            "edit" => Edit(args.Length > 1 ? args[1] : null),
             _ => Report()
         };
     }
@@ -192,6 +194,96 @@ internal static class Program
 
         engine.Stop();
         return 0;
+    }
+
+    /// <summary>Exercises each editor export path and reports what actually came out.</summary>
+    private static int Edit(string? file)
+    {
+        var store = new SettingsStore();
+        var settings = store.Load();
+
+        var ffmpeg = FfmpegLocator.Locate(settings.FfmpegPath);
+        if (ffmpeg is null) { Console.WriteLine("ffmpeg not found"); return 1; }
+
+        var ffprobe = Path.Combine(Path.GetDirectoryName(ffmpeg.Path)!, "ffprobe.exe");
+        if (!File.Exists(ffprobe)) ffprobe = null!;
+
+        if (file is null)
+        {
+            file = Directory.Exists(settings.SaveDirectory)
+                ? Directory.EnumerateFiles(settings.SaveDirectory, "*.mp4")
+                    .OrderByDescending(File.GetCreationTimeUtc).FirstOrDefault()
+                : null;
+        }
+
+        if (file is null || !File.Exists(file))
+        {
+            Console.WriteLine("No clip to edit. Record one first, or pass a path.");
+            return 1;
+        }
+
+        var source = ClipLibrary.Probe(file, ffprobe, null, ffmpeg.Path);
+        Header($"Editing {Path.GetFileName(file)}  ({source.DurationSeconds:0.00}s, " +
+               $"{source.ResolutionLabel}, {source.SizeLabel})");
+
+        double start = Math.Min(2.0, source.DurationSeconds / 4);
+        double end = Math.Min(start + 5.0, source.DurationSeconds);
+
+        var encoder = new ReplayEngine(settings, new ClipLibrary()).ActiveEncoderName;
+
+        var cases = new (string Name, EditSpec Spec)[]
+        {
+            ("precise trim", new EditSpec
+            {
+                InputPath = file, OutputPath = ClipEditor.SuggestOutputPath(file, ".test-precise"),
+                StartSeconds = start, EndSeconds = end, BitrateKbps = settings.BitrateKbps,
+                EncoderName = encoder
+            }),
+            ("lossless trim", new EditSpec
+            {
+                InputPath = file, OutputPath = ClipEditor.SuggestOutputPath(file, ".test-lossless"),
+                StartSeconds = start, EndSeconds = end, Lossless = true
+            }),
+            ("2x speed, muted, 720p", new EditSpec
+            {
+                InputPath = file, OutputPath = ClipEditor.SuggestOutputPath(file, ".test-fast"),
+                StartSeconds = start, EndSeconds = end, Speed = 2.0, MuteAudio = true,
+                TargetHeight = 720, BitrateKbps = settings.BitrateKbps, EncoderName = encoder
+            })
+        };
+
+        int failures = 0;
+        foreach (var (name, spec) in cases)
+        {
+            var sw = Stopwatch.StartNew();
+            double lastProgress = 0;
+            var progress = new Progress<double>(v => lastProgress = v);
+
+            var result = ClipEditor.ExportAsync(spec, ffmpeg.Path, progress).GetAwaiter().GetResult();
+            sw.Stop();
+
+            if (!result.Success)
+            {
+                Console.WriteLine($"  FAIL  {name,-24} {result.Error}");
+                failures++;
+                continue;
+            }
+
+            var probed = ClipLibrary.Probe(spec.OutputPath, ffprobe, null, ffmpeg.Path);
+            double expected = spec.OutputDuration;
+            double drift = Math.Abs(probed.DurationSeconds - expected);
+
+            Console.WriteLine($"  PASS  {name,-24} {sw.ElapsedMilliseconds,5} ms  " +
+                              $"{probed.DurationSeconds:0.00}s (wanted {expected:0.00}s, drift {drift:0.00}s)  " +
+                              $"{probed.ResolutionLabel}  {probed.SizeLabel}  progress={lastProgress:0.00}" +
+                              (result.UsedFallbackEncoder ? "  [software fallback]" : string.Empty));
+
+            try { File.Delete(spec.OutputPath); } catch { /* leave it */ }
+        }
+
+        Console.WriteLine();
+        Console.WriteLine(failures == 0 ? "All export paths work." : $"{failures} export path(s) failed.");
+        return failures == 0 ? 0 : 1;
     }
 
     private static void Header(string title)

@@ -113,6 +113,8 @@
                                                 Margin="0,10,0,0">
                                         <Button Style="{StaticResource ClipAction}" Content="Play"
                                                 Command="{Binding PlayCommand}" />
+                                        <Button Style="{StaticResource ClipAction}" Content="Edit"
+                                                Click="OnEditClick" />
                                         <Button Style="{StaticResource ClipAction}" Content="Show in folder"
                                                 Command="{Binding RevealCommand}" />
                                         <Button Style="{StaticResource ClipAction}" Content="Rename"
