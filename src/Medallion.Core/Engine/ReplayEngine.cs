@@ -243,6 +243,7 @@ public sealed class ReplayEngine : IDisposable
         a.MicrophoneVolume != b.MicrophoneVolume ||
         a.SeparateAudioTracks != b.SeparateAudioTracks ||
         a.AudioBitrateKbps != b.AudioBitrateKbps ||
+        a.AudioOffsetMs != b.AudioOffsetMs ||
         a.FfmpegPath != b.FfmpegPath;
 
     // ---- supervisor -----------------------------------------------------
@@ -335,7 +336,8 @@ public sealed class ReplayEngine : IDisposable
             {
                 AudioInputs = audioSpecs,
                 SeparateAudioTracks = settings.SeparateAudioTracks,
-                AudioBitrateKbps = settings.AudioBitrateKbps
+                AudioBitrateKbps = settings.AudioBitrateKbps,
+                AudioOffsetMs = settings.AudioOffsetMs
             };
 
             // Retain the clip length plus one and a half keyframe intervals, so a cut point

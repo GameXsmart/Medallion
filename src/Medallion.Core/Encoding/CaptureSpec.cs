@@ -35,6 +35,9 @@ public sealed record CaptureSpec
     public bool SeparateAudioTracks { get; init; }
     public int AudioBitrateKbps { get; init; } = 160;
 
+    /// <summary>Shift applied to every audio input. Negative moves audio earlier.</summary>
+    public int AudioOffsetMs { get; init; }
+
     /// <summary>Width/height actually fed to the encoder, after crop and scale.</summary>
     public (int Width, int Height) EncodedSize
     {

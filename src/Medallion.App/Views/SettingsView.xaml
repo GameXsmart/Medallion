@@ -294,6 +294,25 @@
                                   Content="Keep microphone on a separate audio track"
                                   IsChecked="{Binding SeparateAudioTracks, Mode=TwoWay}" />
 
+                        <Grid Style="{StaticResource Row}" Margin="0,16,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="300" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                <TextBlock Text="Audio sync offset" Style="{StaticResource RowLabel}" />
+                                <TextBlock Style="{StaticResource RowHint}"
+                                           Text="If the sound lags behind the picture, drag left. Windows can hand audio over late while the machine is busy." />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Text="{Binding AudioOffsetLabel}" Style="{StaticResource RowLabel}"
+                                           HorizontalAlignment="Right" />
+                                <Slider Style="{StaticResource Slim}" Minimum="-1000" Maximum="1000"
+                                        TickFrequency="10" IsSnapToTickEnabled="True"
+                                        Value="{Binding AudioOffsetMs, Mode=TwoWay}" Margin="0,4,0,0" />
+                            </StackPanel>
+                        </Grid>
+
                         <Button Style="{StaticResource GhostButton}" Content="Refresh devices"
                                 Command="{Binding RefreshDevicesCommand}" HorizontalAlignment="Left"
                                 Margin="0,14,0,0" Padding="11,6" FontSize="11.5" />

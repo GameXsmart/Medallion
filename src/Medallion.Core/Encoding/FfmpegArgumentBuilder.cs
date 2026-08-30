@@ -39,6 +39,12 @@ public static class FfmpegArgumentBuilder
 
         foreach (var audio in spec.AudioInputs)
         {
+            // itsoffset shifts this input's timestamps; negative pulls the audio earlier to
+            // compensate for Windows handing loopback samples over late.
+            if (spec.AudioOffsetMs != 0)
+                sb.Append("-itsoffset ")
+                  .Append((spec.AudioOffsetMs / 1000.0).ToString("0.###", Inv)).Append(' ');
+
             sb.Append("-thread_queue_size 4096 -use_wallclock_as_timestamps 1 ")
               .Append("-f ").Append(audio.SampleFormat)
               .Append(" -ar ").Append(audio.SampleRate.ToString(Inv))

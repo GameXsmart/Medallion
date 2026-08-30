@@ -95,6 +95,20 @@ recent clip, then measures the result against what was asked for:
 
 The lossless drift is expected: a stream copy can only start on a keyframe.
 
+Two more, for audio sync complaints:
+
+```
+medallion-doctor audiolat     how late Windows hands loopback audio over
+medallion-doctor audiodrift   the audio device's clock against the system clock
+```
+
+`audiolat` distinguishes "the sound was produced late" from "we delayed it". `audiodrift`
+needs sound playing and reports how far a clock-driven pump would drift per hour — on the
+development machine's USB interface the device ran 0.18% fast, which is 6.4s an hour.
+
+If clips come back with the audio behind the picture, raise or lower **Settings → Audio →
+Audio sync offset**. Negative moves the audio earlier.
+
 `record` is the quickest way to prove the whole chain works: it prints live buffer depth and
 frame rate, saves a clip, reports how long the save took, and then confirms that buffering
 continued afterwards.

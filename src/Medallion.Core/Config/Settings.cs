@@ -134,6 +134,16 @@ public sealed class Settings
 
     public int AudioBitrateKbps { get; set; } = 160;
 
+    /// <summary>
+    /// Shifts the audio track against the video, in milliseconds. Negative moves audio
+    /// earlier, which is the fix when the sound lags the picture.
+    ///
+    /// Windows can hand loopback audio over noticeably late while the machine is busy
+    /// (measured at 46 ms idle and 379 ms under full CPU load on the development machine),
+    /// and that lateness is baked into the recording. This is the dial for it.
+    /// </summary>
+    public int AudioOffsetMs { get; set; }
+
     // ---- Output ---------------------------------------------------------
     public string SaveDirectory { get; set; } = DefaultSaveDirectory;
 
@@ -200,6 +210,7 @@ public sealed class Settings
         if (string.IsNullOrWhiteSpace(FileNameTemplate)) FileNameTemplate = "Medallion_{yyyy-MM-dd_HH-mm-ss}";
         if (SaveClipHotkey is null || SaveClipHotkey.VirtualKey == 0) SaveClipHotkey = new HotkeyBinding();
         if (PauseHotkey is { VirtualKey: 0 }) PauseHotkey = null;
+        AudioOffsetMs = Math.Clamp(AudioOffsetMs, -2000, 2000);
         if (MaxLibraryGigabytes < 0) MaxLibraryGigabytes = 0;
         if (MaxLibraryGigabytes > 2048) MaxLibraryGigabytes = 2048;
     }

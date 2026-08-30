@@ -330,6 +330,27 @@ public sealed class SettingsViewModel : ObservableObject
 
     public string MicVolumeLabel => $"{MicVolume:0}%";
 
+    public double AudioOffsetMs
+    {
+        get => _working.AudioOffsetMs;
+        set
+        {
+            int rounded = (int)Math.Round(value / 10) * 10;
+            if (rounded == _working.AudioOffsetMs) return;
+            _working.AudioOffsetMs = rounded;
+            Touch();
+            Raise();
+            Raise(nameof(AudioOffsetLabel));
+        }
+    }
+
+    public string AudioOffsetLabel => _working.AudioOffsetMs switch
+    {
+        0 => "In sync",
+        < 0 => $"{-_working.AudioOffsetMs} ms earlier",
+        _ => $"{_working.AudioOffsetMs} ms later"
+    };
+
     public bool SeparateAudioTracks
     {
         get => _working.SeparateAudioTracks;
@@ -580,6 +601,7 @@ public sealed class SettingsViewModel : ObservableObject
             nameof(CaptureSystemAudio), nameof(SelectedRenderDevice), nameof(SystemVolume),
             nameof(SystemVolumeLabel), nameof(CaptureMicrophone), nameof(SelectedCaptureDevice),
             nameof(MicVolume), nameof(MicVolumeLabel), nameof(SeparateAudioTracks),
+            nameof(AudioOffsetMs), nameof(AudioOffsetLabel),
             nameof(HotkeyLabel), nameof(HotkeyStatusLabel), nameof(PauseHotkeyLabel),
             nameof(SelectedTheme), nameof(PlaySoundOnSave), nameof(MaxLibraryGb),
             nameof(MaxLibraryLabel), nameof(SaveDirectory),

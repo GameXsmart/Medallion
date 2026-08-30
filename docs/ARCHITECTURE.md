@@ -138,6 +138,40 @@ without this the audio stream would stall, drag the muxer with it, and desynchro
 everything after the next sound. A bounded queue drops the oldest audio rather than growing
 without limit if the consumer ever stalls.
 
+## Audio/video sync
+
+The audio pump is driven by the **audio device's** clock, not the system clock, and this is
+the single most important thing about it.
+
+The obvious design is to decide how much audio "should" exist from wall-clock time and pad
+the difference with silence. That design drifts, because the two clocks are not the same
+one. Measured on the development machine's USB interface:
+
+```
+  system clock elapsed :   34.938s
+  audio delivered      :   35.000s
+  device/system ratio  : 1.001775
+  -> a clock-driven pump drifts 6.4s per hour
+```
+
+At 0.18% the surplus fills the queue in minutes, and every queued byte is audio delay
+against the video — a lag that grows while the app sits in the tray and then plateaus at
+whatever the queue cap is. It presents as "the voice is a few seconds behind".
+
+So the pump writes every sample the device delivers, as it delivers it, and synthesises
+silence only to fill a *real* gap in delivery (loopback sends nothing at all while the
+system is silent). ffmpeg timestamps the input against the wall clock and `aresample`
+absorbs the rate difference, so the stream stays anchored to real time without anything
+accumulating. The queue cap is only a guard against unbounded growth if the consumer dies,
+and is kept well clear of a single WASAPI delivery (peaks of 110 ms were measured) so that
+bursts are not mistaken for a backlog.
+
+A separate, smaller effect remains and is not ours to fix: Windows hands loopback audio over
+late when the machine is busy — 46 ms idle against 379 ms under full CPU load, measured
+independently of the capture engine with `medallion-doctor audiolat`. That lateness is baked
+into whatever is recorded, so **Audio sync offset** in Settings shifts the track to
+compensate. Applying −380 ms under that load moved a measured 0.534 s offset to 0.135 s.
+
 ## Failure handling
 
 The supervisor loop treats every failure below it as recoverable:

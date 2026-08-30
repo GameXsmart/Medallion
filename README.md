@@ -56,6 +56,7 @@ x64 machine.
 | Storage cap | Keep at most *N* GB; the oldest clips are pruned automatically |
 | Library search and sort | Filter by name; order by newest, oldest, largest or longest |
 | Editor shortcuts | Space to play, I and O to set the trim, arrows to step (Shift for 1s) |
+| Audio sync offset | Shifts the audio track if sound lags the picture on your hardware |
 | Tray shortcuts | Save, pause/resume, clips folder, dashboard, settings, exit |
 
 ## Measured on the development machine

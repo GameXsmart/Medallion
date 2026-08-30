@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -16,7 +16,7 @@
     <AssemblyTitle>Medallion</AssemblyTitle>
     <Company>Medallion</Company>
     <Description>Instant replay clipping for Windows</Description>
-    <Version>1.1.0</Version>
+    <Version>1.1.1</Version>
     <Copyright>Copyright (c) 2026</Copyright>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
     <!-- Workstation concurrent GC off: lower background CPU while idle in tray. -->
@@ -32,3 +32,4 @@
   </ItemGroup>
 
 </Project>
+
